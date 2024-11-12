@@ -1,0 +1,26 @@
+{
+  "name": "graphql-server-benchmark",
+  "version": "1.0.0",
+  "author": "mypolat",
+  "description": "Benchmark different GraphQL server implementations",
+  "scripts": {
+    "test:fastify-mercurius": "node src/servers/fastify-mercurius.js",
+    "test:express-apollo": "node src/servers/express-apollo.js",
+    "test:fastify-apollo": "node src/servers/fastify-apollo.js",
+    "test:all": "./scripts/run-tests.sh"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.9.5",
+    "@as-integrations/fastify": "^2.1.1",
+    "express": "^4.18.2",
+    "fastify": "^4.24.3",
+    "mercurius": "^13.3.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1"
+  }
+}
