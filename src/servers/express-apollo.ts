@@ -5,24 +5,20 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import { schema, resolvers } from '../schema'
 
-const PORT = process.env.PORT || 3002
+const PORT = parseInt(process.env.PORT || '3002', 10)
 
-async function startServer() {
+async function startServer(): Promise<void> {
     const app = express()
 
     const server = new ApolloServer({
         typeDefs: schema,
         resolvers,
-        introspection: false,
-        // Apollo specific optimizations
-        cache: 'bounded',
         plugins: [
             {
-                // Simple plugin to log response times
-                async requestDidStart({ request, context }) {
+                async requestDidStart() {
                     const start = Date.now()
                     return {
-                        async willSendResponse({ response }) {
+                        async willSendResponse() {
                             const stop = Date.now()
                             const time = stop - start
                             console.log(`Request processed in ${time}ms`)
@@ -41,7 +37,6 @@ async function startServer() {
         bodyParser.json(),
         expressMiddleware(server, {
             context: async ({ req, res }) => ({
-                // Add any context you need
                 request: req,
                 response: res
             })

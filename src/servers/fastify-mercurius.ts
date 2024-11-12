@@ -1,11 +1,11 @@
-import Fastify from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
 import mercurius from 'mercurius'
 import { schema, resolvers } from '../schema'
 
-const PORT = process.env.PORT || 3001
+const PORT = parseInt(process.env.PORT || '3001', 10)
 
-async function startServer() {
-    const app = Fastify({
+async function startServer(): Promise<void> {
+    const app: FastifyInstance = Fastify({
         logger: {
             level: 'error',
             transport: {
@@ -19,11 +19,10 @@ async function startServer() {
         schema,
         resolvers,
         graphiql: false,
-        jit: 1, // Enable JIT
+        jit: 1,
         cache: true,
         context: (request, reply) => {
             return {
-                // Add any context you need
                 request,
                 reply
             }
@@ -31,7 +30,7 @@ async function startServer() {
     })
 
     try {
-        await app.listen({ port: PORT })
+        await app.listen({ port: PORT, host: '0.0.0.0' })
         console.log(`Fastify + Mercurius server running at http://localhost:${PORT}/graphql`)
     } catch (err) {
         app.log.error(err)

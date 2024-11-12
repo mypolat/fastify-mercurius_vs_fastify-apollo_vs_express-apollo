@@ -1,12 +1,12 @@
-import Fastify from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
 import { ApolloServer } from '@apollo/server'
 import { fastifyApolloHandler } from '@as-integrations/fastify'
 import { schema, resolvers } from '../schema'
 
-const PORT = process.env.PORT || 3003
+const PORT = parseInt(process.env.PORT || '3003', 10)
 
-async function startServer() {
-    const app = Fastify({
+async function startServer(): Promise<void> {
+    const app: FastifyInstance = Fastify({
         logger: {
             level: 'error',
             transport: {
@@ -18,14 +18,12 @@ async function startServer() {
     const server = new ApolloServer({
         typeDefs: schema,
         resolvers,
-        introspection: false,
-        cache: 'bounded',
         plugins: [
             {
-                async requestDidStart({ request, context }) {
+                async requestDidStart() {
                     const start = Date.now()
                     return {
-                        async willSendResponse({ response }) {
+                        async willSendResponse() {
                             const stop = Date.now()
                             const time = stop - start
                             console.log(`Request processed in ${time}ms`)
@@ -38,13 +36,11 @@ async function startServer() {
 
     await server.start()
 
-    // Register Apollo handler
     app.route({
         url: '/graphql',
         method: ['POST', 'OPTIONS'],
         handler: fastifyApolloHandler(server, {
             context: async (request, reply) => ({
-                // Add any context you need
                 request,
                 reply
             })
@@ -52,7 +48,7 @@ async function startServer() {
     })
 
     try {
-        await app.listen({ port: PORT })
+        await app.listen({ port: PORT, host: '0.0.0.0' })
         console.log(`Fastify + Apollo server running at http://localhost:${PORT}/graphql`)
     } catch (err) {
         app.log.error(err)

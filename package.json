@@ -4,10 +4,30 @@
   "author": "mypolat",
   "description": "Benchmark different GraphQL server implementations",
   "scripts": {
-    "test:fastify-mercurius": "node src/servers/fastify-mercurius.js",
-    "test:express-apollo": "node src/servers/express-apollo.js",
-    "test:fastify-apollo": "node src/servers/fastify-apollo.js",
-    "test:all": "./scripts/run-tests.sh"
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+
+    "start:fastify-mercurius": "node dist/servers/fastify-mercurius.js",
+    "start:express-apollo": "node dist/servers/express-apollo.js",
+    "start:fastify-apollo": "node dist/servers/fastify-apollo.js",
+
+    "dev:fastify-mercurius": "ts-node src/servers/fastify-mercurius.ts",
+    "dev:express-apollo": "ts-node src/servers/express-apollo.ts",
+    "dev:fastify-apollo": "ts-node src/servers/fastify-apollo.ts",
+
+    "start:all": "concurrently \"npm run start:fastify-mercurius\" \"npm run start:express-apollo\" \"npm run start:fastify-apollo\"",
+    "dev:all": "concurrently \"npm run dev:fastify-mercurius\" \"npm run dev:express-apollo\" \"npm run dev:fastify-apollo\"",
+
+    "test:smoke": "k6 run --tag testType=smoke k6/load-test.js",
+    "test:load": "k6 run --tag testType=load k6/load-test.js",
+    "test:stress": "k6 run --tag testType=stress k6/load-test.js",
+    "test:spike": "k6 run --tag testType=spike k6/load-test.js",
+
+    "test:all": "./scripts/run-tests.sh",
+
+    "docker:build": "docker-compose build",
+    "docker:test": "docker-compose up"
   },
   "dependencies": {
     "@apollo/server": "^4.9.5",
@@ -20,7 +40,11 @@
   },
   "devDependencies": {
     "@types/node": "^20.8.7",
+    "@types/express": "^4.17.20",
+    "@types/cors": "^2.8.15",
     "typescript": "^5.2.2",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "pino-pretty": "^10.2.3",
+    "concurrently": "^8.2.2"
   }
 }

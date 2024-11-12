@@ -12,6 +12,24 @@ export interface Post {
     authorId: string
 }
 
+// GraphQL input types
+interface UserInput {
+    name: string
+    email: string
+}
+
+interface PostInput {
+    userId: string
+    title: string
+    content: string
+}
+
+// Context type
+export interface Context {
+    request: any
+    reply: any
+}
+
 // Schema
 export const schema = `
   type User {
@@ -59,24 +77,32 @@ export const posts: Post[] = new Array(5000).fill(0).map((_, i) => ({
 export const resolvers = {
     Query: {
         users: () => users,
-        user: (_, { id }) => users.find(u => u.id === id),
+        user: (_: unknown, { id }: { id: string }) =>
+            users.find(u => u.id === id),
         posts: () => posts,
-        post: (_, { id }) => posts.find(p => p.id === id)
+        post: (_: unknown, { id }: { id: string }) =>
+            posts.find(p => p.id === id)
     },
     User: {
-        posts: (user) => posts.filter(p => p.authorId === user.id)
+        posts: (user: User) =>
+            posts.filter(p => p.authorId === user.id)
     },
     Post: {
-        author: (post) => users.find(u => u.id === post.authorId)
+        author: (post: Post) =>
+            users.find(u => u.id === post.authorId)
     },
     Mutation: {
-        createUser: (_, { name, email }) => {
-            const user = { id: `user-${users.length + 1}`, name, email }
+        createUser: (_: unknown, { name, email }: UserInput) => {
+            const user: User = {
+                id: `user-${users.length + 1}`,
+                name,
+                email
+            }
             users.push(user)
             return user
         },
-        createPost: (_, { userId, title, content }) => {
-            const post = {
+        createPost: (_: unknown, { userId, title, content }: PostInput) => {
+            const post: Post = {
                 id: `post-${posts.length + 1}`,
                 title,
                 content,
